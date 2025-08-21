@@ -5,4 +5,6 @@ class Pick < ApplicationRecord
   belongs_to :team
 
   validates :user_id, uniqueness: { scope: [:season_id, :team_id], message: "You already picked this team this season" }
+
+
 end
