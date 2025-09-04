@@ -10,6 +10,8 @@ class Pick < ApplicationRecord
 
 
   def pick_in_before_week_kickoff
-    true
+    if week.start_date < Time.current
+      errors.add(:base, "You cannot make or change a pick after the start of the week's first game.")
+    end
   end
 end
