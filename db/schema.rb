@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_20_185521) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_11_190155) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,10 +22,32 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_185521) do
     t.bigint "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "pool_id", null: false
+    t.index ["pool_id"], name: "index_picks_on_pool_id"
     t.index ["season_id"], name: "index_picks_on_season_id"
     t.index ["team_id"], name: "index_picks_on_team_id"
     t.index ["user_id"], name: "index_picks_on_user_id"
     t.index ["week_id"], name: "index_picks_on_week_id"
+  end
+
+  create_table "pool_memberships", force: :cascade do |t|
+    t.bigint "pool_id", null: false
+    t.bigint "user_id", null: false
+    t.string "role"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pool_id"], name: "index_pool_memberships_on_pool_id"
+    t.index ["user_id"], name: "index_pool_memberships_on_user_id"
+  end
+
+  create_table "pools", force: :cascade do |t|
+    t.string "name"
+    t.bigint "season_id", null: false
+    t.integer "admin_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_id"], name: "index_pools_on_admin_id"
+    t.index ["season_id"], name: "index_pools_on_season_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -67,9 +89,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_185521) do
     t.index ["season_id"], name: "index_weeks_on_season_id"
   end
 
+  add_foreign_key "picks", "pools"
   add_foreign_key "picks", "seasons"
   add_foreign_key "picks", "teams"
   add_foreign_key "picks", "users"
   add_foreign_key "picks", "weeks"
+  add_foreign_key "pool_memberships", "pools"
+  add_foreign_key "pool_memberships", "users"
+  add_foreign_key "pools", "seasons"
   add_foreign_key "weeks", "seasons"
 end
