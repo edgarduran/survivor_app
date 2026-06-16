@@ -10,9 +10,9 @@ RSpec.describe Pick, type: :model do
     )
   }
   let(:pool_membership) { PoolMembership.create(user:, pool:, role: 'member') }
-  let(:week) { Week.create(week_number: 1, start_date: DateTime.now + 2.hour, season: season)}
-  let!(:week2)  { Week.create!(week_number: 2, start_date: 2.weeks.from_now, season: season) }
-  let!(:week3)  { Week.create!(week_number: 3, start_date: 3.weeks.from_now, season: season) }
+  let(:week) { Week.create(week_number: 1, picks_lock_at: DateTime.now + 2.hour, season: season)}
+  let!(:week2)  { Week.create!(week_number: 2, picks_lock_at: 2.weeks.from_now, season: season) }
+  let!(:week3)  { Week.create!(week_number: 3, picks_lock_at: 3.weeks.from_now, season: season) }
   let!(:chicago_team) { Team.create(name: 'Chicago Bears') }
   let!(:denver_team) { Team.create!(name: 'Denver Broncos') }
   let!(:green_bay_team) { Team.create!(name: 'Green Bay Packers') }
@@ -52,7 +52,7 @@ RSpec.describe Pick, type: :model do
       let(:team) { chicago_team }
 
       before do
-        travel_to(week.start_date - 1.hour) do
+        travel_to(week.picks_lock_at - 1.hour) do
           Pick.create!(pool: pool, user: user, season: season, week: week, team: team)
         end
       end
@@ -83,7 +83,7 @@ RSpec.describe Pick, type: :model do
 
     context 'when user attempts to submit pick after weekly deadline' do
       it 'does not save user pick when deadline passes' do
-        travel_to(week.start_date + 1.minute) do
+        travel_to(week.picks_lock_at + 1.minute) do
           late_pick = Pick.new(user: user, season: season, week: week, team: chicago_team)
 
           expect(late_pick).to be_invalid
@@ -94,7 +94,7 @@ RSpec.describe Pick, type: :model do
 
     context 'when user tries to make more than one pick in the same week' do
       before do
-        travel_to(week.start_date - 1.hour) do
+        travel_to(week.picks_lock_at - 1.hour) do
           Pick.create!(pool:, user:, season:, week:, team: chicago_team)
         end
       end
