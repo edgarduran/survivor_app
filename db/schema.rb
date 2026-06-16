@@ -10,9 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_11_190155) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_173303) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "games", force: :cascade do |t|
+    t.datetime "kickoff_at", null: false
+    t.string "external_id"
+    t.integer "home_score"
+    t.integer "away_score"
+    t.string "status", default: "scheduled", null: false
+    t.bigint "week_id", null: false
+    t.bigint "home_team_id", null: false
+    t.bigint "away_team_id", null: false
+    t.bigint "winning_team_id", null: false
+    t.bigint "losing_team_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["away_team_id"], name: "index_games_on_away_team_id"
+    t.index ["home_team_id"], name: "index_games_on_home_team_id"
+    t.index ["losing_team_id"], name: "index_games_on_losing_team_id"
+    t.index ["week_id"], name: "index_games_on_week_id"
+    t.index ["winning_team_id"], name: "index_games_on_winning_team_id"
+  end
 
   create_table "picks", force: :cascade do |t|
     t.boolean "is_correct"
@@ -82,13 +102,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_11_190155) do
 
   create_table "weeks", force: :cascade do |t|
     t.integer "week_number"
-    t.datetime "start_date"
+    t.datetime "picks_lock_at"
     t.bigint "season_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "week_type", default: "regular", null: false
     t.index ["season_id"], name: "index_weeks_on_season_id"
   end
 
+  add_foreign_key "games", "teams", column: "away_team_id"
+  add_foreign_key "games", "teams", column: "home_team_id"
+  add_foreign_key "games", "teams", column: "losing_team_id"
+  add_foreign_key "games", "teams", column: "winning_team_id"
+  add_foreign_key "games", "weeks"
   add_foreign_key "picks", "pools"
   add_foreign_key "picks", "seasons"
   add_foreign_key "picks", "teams"
