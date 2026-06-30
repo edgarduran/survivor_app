@@ -42,12 +42,13 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
-group :development, :test do\
+group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
-  gem 'rspec-rails'
-  gem 'pry'
+  gem "rspec-rails"
+  gem "pry"
+  gem "dotenv-rails"
 end
 
 group :development do

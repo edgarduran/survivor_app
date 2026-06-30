@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_173303) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_28_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,8 +23,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_173303) do
     t.bigint "week_id", null: false
     t.bigint "home_team_id", null: false
     t.bigint "away_team_id", null: false
-    t.bigint "winning_team_id", null: false
-    t.bigint "losing_team_id", null: false
+    t.bigint "winning_team_id"
+    t.bigint "losing_team_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["away_team_id"], name: "index_games_on_away_team_id"
@@ -32,6 +32,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_173303) do
     t.index ["losing_team_id"], name: "index_games_on_losing_team_id"
     t.index ["week_id"], name: "index_games_on_week_id"
     t.index ["winning_team_id"], name: "index_games_on_winning_team_id"
+  end
+
+  create_table "oauth_identities", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "provider"
+    t.string "uid"
+    t.string "token"
+    t.string "secret"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "uid"], name: "index_oauth_identities_on_provider_and_uid", unique: true
+    t.index ["user_id", "provider"], name: "index_oauth_identities_on_user_id_and_provider", unique: true
+    t.index ["user_id"], name: "index_oauth_identities_on_user_id"
   end
 
   create_table "picks", force: :cascade do |t|
@@ -95,9 +108,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_173303) do
     t.string "last_name"
     t.string "email"
     t.string "username"
-    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   create_table "weeks", force: :cascade do |t|
@@ -115,6 +133,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_173303) do
   add_foreign_key "games", "teams", column: "losing_team_id"
   add_foreign_key "games", "teams", column: "winning_team_id"
   add_foreign_key "games", "weeks"
+  add_foreign_key "oauth_identities", "users"
   add_foreign_key "picks", "pools"
   add_foreign_key "picks", "seasons"
   add_foreign_key "picks", "teams"

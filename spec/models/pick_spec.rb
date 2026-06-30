@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Pick, type: :model do
   let(:pool) { Pool.create(name: 'Test Pool', season: season) }
-  let(:user) { User.create(first_name: 'Homer', last_name: 'Simpson', email: 'test@example.com')}
+  let(:user) { User.create!(first_name: 'Homer', last_name: 'Simpson', email: 'test@example.com', password: 'password123') }
   let(:season) {
     Season.create(
       start_date: Date.new(Date.today.year - 1, Date.today.month, Date.today.day),
