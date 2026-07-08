@@ -1,6 +1,6 @@
 class DashboardController < ApplicationController
 
   def index
-    @email = current_user.email
+    @pools = current_user.pools.includes(:season, :pool_memberships)
   end
 end
