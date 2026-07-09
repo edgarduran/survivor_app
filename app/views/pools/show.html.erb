@@ -9,7 +9,7 @@
     <% end %>
   </div>
 
-  <div class="bg-white rounded-lg shadow">
+  <div class="bg-white rounded-lg shadow mb-6">
     <div class="px-6 py-4 border-b border-gray-100">
       <h3 class="font-semibold text-gray-700">Members (<%= @pool.pool_memberships.size %>)</h3>
     </div>
@@ -29,5 +29,37 @@
     </ul>
   </div>
 
-  <%= link_to "← Back to Dashboard", root_path, class: "mt-6 inline-block text-blue-900 hover:underline text-sm" %>
+  <% if current_user.admin_of?(@pool) %>
+    <div class="bg-white rounded-lg shadow mb-6">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-700">Invite Someone</h3>
+      </div>
+      <div class="px-6 py-4">
+        <%= form_with url: pool_invitations_path(@pool), method: :post, class: "flex gap-3" do |f| %>
+          <%= f.email_field :email,
+              name: "invitation[email]",
+              placeholder: "Enter email address",
+              class: "flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+          <%= f.submit "Send Invite",
+              class: "bg-blue-900 text-white px-4 py-2 rounded font-semibold hover:bg-blue-800 cursor-pointer" %>
+        <% end %>
+      </div>
+
+      <% if @pending_invitations.any? %>
+        <div class="px-6 pb-4">
+          <p class="text-sm font-semibold text-gray-500 mb-2">Pending Invitations</p>
+          <ul class="space-y-1">
+            <% @pending_invitations.each do |invite| %>
+              <li class="text-sm text-gray-600 flex justify-between">
+                <span><%= invite.email %></span>
+                <span class="text-gray-400">Sent <%= time_ago_in_words(invite.created_at) %> ago</span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= link_to "← Back to Dashboard", root_path, class: "text-blue-900 hover:underline text-sm" %>
 </div>

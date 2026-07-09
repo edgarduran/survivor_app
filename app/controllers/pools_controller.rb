@@ -20,6 +20,7 @@ class PoolsController < ApplicationController
   end
 
   def show
+    @pending_invitations = @pool.invitations.where(accepted_at: nil) if current_user.admin_of?(@pool)
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_28_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,6 +32,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_28_000001) do
     t.index ["losing_team_id"], name: "index_games_on_losing_team_id"
     t.index ["week_id"], name: "index_games_on_week_id"
     t.index ["winning_team_id"], name: "index_games_on_winning_team_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.bigint "pool_id", null: false
+    t.bigint "invited_by_id", null: false
+    t.string "email", null: false
+    t.string "token", null: false
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invited_by_id"], name: "index_invitations_on_invited_by_id"
+    t.index ["pool_id", "email"], name: "index_invitations_on_pool_id_and_email", unique: true
+    t.index ["pool_id"], name: "index_invitations_on_pool_id"
+    t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
   create_table "oauth_identities", force: :cascade do |t|
@@ -133,6 +147,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_28_000001) do
   add_foreign_key "games", "teams", column: "losing_team_id"
   add_foreign_key "games", "teams", column: "winning_team_id"
   add_foreign_key "games", "weeks"
+  add_foreign_key "invitations", "pools"
+  add_foreign_key "invitations", "users", column: "invited_by_id"
   add_foreign_key "oauth_identities", "users"
   add_foreign_key "picks", "pools"
   add_foreign_key "picks", "seasons"

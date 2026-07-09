@@ -5,6 +5,7 @@ class Pool < ApplicationRecord
   has_many :pool_memberships, dependent: :destroy
   has_many :users, through: :pool_memberships
   has_many :picks, dependent: :destroy
+  has_many :invitations, dependent: :destroy
 
   validates :name, presence: true
 end

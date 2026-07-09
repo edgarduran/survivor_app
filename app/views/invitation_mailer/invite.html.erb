@@ -1,0 +1,15 @@
+<p>Hi there,</p>
+
+<p>
+  <strong><%= @invited_by.first_name %> <%= @invited_by.last_name %></strong>
+  has invited you to join <strong><%= @pool.name %></strong> on Survivor Pool —
+  an NFL survivor pool where you pick one team to lose each week.
+</p>
+
+<p>
+  <%= link_to "Accept Invitation", @accept_url %>
+</p>
+
+<p>This link is unique to you. Don't share it.</p>
+
+<p>— The Survivor Pool Team</p>
