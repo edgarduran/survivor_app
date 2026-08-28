@@ -5,14 +5,14 @@ class InvitationsController < ApplicationController
   before_action :require_commissioner!, only: [:create]
 
   def create
-    @invitation = @pool.invitations.build(email: invitation_params[:email], invited_by: current_user)
+    @invitation = @pool.invitations.build(invitation_params.merge(invited_by: current_user))
 
     if @invitation.save
       # TODO: Replace with deliver_later once Sidekiq/Redis is configured
       InvitationMailer.invite(@invitation).deliver_now
-      redirect_to @pool, notice: "Invitation sent to #{@invitation.email}."
+      redirect_to manage_pool_path(@pool), notice: "Invitation sent to #{@invitation.email}."
     else
-      redirect_to @pool, alert: @invitation.errors.full_messages.to_sentence
+      redirect_to manage_pool_path(@pool), alert: @invitation.errors.full_messages.to_sentence
     end
   end
 
@@ -35,7 +35,7 @@ class InvitationsController < ApplicationController
       return
     end
 
-    @invitation.pool.pool_memberships.create!(user: current_user, role: "member")
+    @invitation.pool.pool_memberships.create!(user: current_user, role: @invitation.role)
     @invitation.update!(accepted_at: Time.current)
 
     redirect_to @invitation.pool, notice: "Welcome to #{@invitation.pool.name}!"
@@ -44,16 +44,20 @@ class InvitationsController < ApplicationController
   private
 
   def set_pool
-    @pool = current_user.pools.find(params[:pool_id])
+    @pool = if current_user.super_admin?
+      Pool.find(params[:pool_id])
+    else
+      current_user.pools.find(params[:pool_id])
+    end
   end
 
   def require_commissioner!
-    unless current_user.admin_of?(@pool)
+    unless current_user.can_manage_pool?(@pool)
       redirect_to root_path, alert: "Only commissioners can send invitations."
     end
   end
 
   def invitation_params
-    params.require(:invitation).permit(:email)
+    params.require(:invitation).permit(:email, :role)
   end
 end

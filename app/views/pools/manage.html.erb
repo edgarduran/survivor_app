@@ -1,0 +1,80 @@
+<div class="max-w-3xl mx-auto px-0 sm:px-4">
+  <div class="flex flex-wrap justify-between items-center gap-2 mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Manage Pool</h2>
+      <p class="text-gray-500 text-sm"><%= @pool.name %> &middot; <%= @pool.season.label %></p>
+    </div>
+    <%= link_to "← Back to Pool", @pool, class: "text-sm text-gray-500 hover:underline" %>
+  </div>
+
+  <%# ── Send invite ──────────────────────────────────────────────── %>
+  <div class="bg-white rounded-lg shadow mb-6">
+    <div class="px-4 py-3 border-b border-gray-100">
+      <h3 class="font-semibold text-gray-700">Send Invitation</h3>
+    </div>
+    <div class="px-4 py-4">
+      <%= form_with url: pool_invitations_path(@pool), method: :post, class: "flex flex-wrap gap-2 items-end" do |f| %>
+        <div class="flex-1 min-w-48">
+          <%= label_tag "invitation[email]", "Email", class: "block text-xs font-semibold text-gray-600 mb-1" %>
+          <%= email_field_tag "invitation[email]", nil,
+              placeholder: "player@example.com",
+              class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        </div>
+        <div>
+          <%= label_tag "invitation[role]", "Role", class: "block text-xs font-semibold text-gray-600 mb-1" %>
+          <%= select_tag "invitation[role]",
+              options_for_select([["Member", "member"], ["Commissioner", "admin"]], "member"),
+              class: "border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        </div>
+        <%= submit_tag "Send Invite",
+            class: "bg-blue-900 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-blue-800 cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── Pending invitations ─────────────────────────────────────── %>
+  <% if @pending_invitations.any? %>
+    <div class="bg-white rounded-lg shadow mb-6">
+      <div class="px-4 py-3 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-700">Pending Invitations</h3>
+      </div>
+      <ul class="divide-y divide-gray-50">
+        <% @pending_invitations.each do |invite| %>
+          <li class="px-4 py-3 flex justify-between items-center text-sm">
+            <div>
+              <span class="text-gray-800"><%= invite.email %></span>
+              <span class="ml-2 text-xs px-2 py-0.5 rounded
+                           <%= invite.admin? ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500' %>">
+                <%= invite.admin? ? "Commissioner" : "Member" %>
+              </span>
+            </div>
+            <span class="text-gray-400 text-xs"><%= time_ago_in_words(invite.created_at) %> ago</span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# ── Current members ─────────────────────────────────────────── %>
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-4 py-3 border-b border-gray-100">
+      <h3 class="font-semibold text-gray-700">Members (<%= @members.size %>)</h3>
+    </div>
+    <ul class="divide-y divide-gray-50">
+      <% @members.each do |membership| %>
+        <li class="px-4 py-3 flex justify-between items-center text-sm">
+          <div>
+            <span class="text-gray-800 font-medium">
+              <%= membership.user.first_name.presence&.concat(" ")&.concat(membership.user.last_name.to_s) || membership.user.email %>
+            </span>
+            <span class="text-gray-400 text-xs ml-1"><%= membership.user.email %></span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded
+                       <%= membership.admin? ? 'bg-blue-100 text-blue-700 font-semibold' : 'bg-gray-100 text-gray-500' %>">
+            <%= membership.admin? ? "Commissioner" : "Member" %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

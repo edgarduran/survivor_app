@@ -10,6 +10,9 @@ Rails.application.routes.draw do
 
   resources :pools, only: [:new, :create, :show] do
     resources :invitations, only: [:create]
+    resources :picks, only: [:create, :update]
+    get :status, on: :member
+    get :manage, on: :member
   end
 
   get "/invitations/:token/accept", to: "invitations#accept", as: :accept_invitation

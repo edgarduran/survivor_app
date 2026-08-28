@@ -21,11 +21,31 @@
     <div class="mb-6">
       <%= f.label :season_id, "Season", class: "block text-sm font-semibold text-gray-700 mb-1" %>
       <% if @seasons.empty? %>
-        <p class="text-sm text-red-600">No seasons available yet. Contact the app admin.</p>
+        <p class="text-sm text-red-600">No seasons available yet.</p>
       <% else %>
         <%= f.select :season_id, @seasons.map { |s| [s.label, s.id] }, { include_blank: "Select a season" },
             class: "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       <% end %>
+    </div>
+
+    <%# Commissioner assignment %>
+    <div class="mb-6 border border-gray-200 rounded-lg p-4">
+      <p class="text-sm font-semibold text-gray-700 mb-3">Commissioner</p>
+
+      <label class="flex items-center gap-2 mb-3 cursor-pointer">
+        <input type="radio" name="commissioner_type" value="self" checked class="peer accent-blue-900">
+        <span class="text-sm text-gray-700">I will be the commissioner</span>
+      </label>
+
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="radio" name="commissioner_type" value="other" id="commissioner_type_other" class="peer accent-blue-900">
+        <span class="text-sm text-gray-700">Delegate to another user (send invite)</span>
+      </label>
+
+      <div id="commissioner_email_field" class="mt-3 hidden">
+        <input type="email" name="commissioner_email" placeholder="Commissioner's email address"
+               class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
     </div>
 
     <div class="flex justify-end gap-3">
@@ -35,3 +55,14 @@
     </div>
   <% end %>
 </div>
+
+<script>
+  document.getElementById("commissioner_type_other").addEventListener("change", function() {
+    document.getElementById("commissioner_email_field").classList.toggle("hidden", !this.checked);
+  });
+  document.querySelectorAll("input[name='commissioner_type']").forEach(function(radio) {
+    radio.addEventListener("change", function() {
+      document.getElementById("commissioner_email_field").classList.toggle("hidden", this.value !== "other");
+    });
+  });
+</script>
